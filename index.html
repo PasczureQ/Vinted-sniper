@@ -6,20 +6,45 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Okazje do resellu</h1>
-  <ul id="list"></ul>
+  <div class="container">
+    <h1>Okazje do resellu</h1>
+    <div id="status">Ładowanie...</div>
+    <ul id="list"></ul>
+  </div>
 
   <script>
-    fetch("https://raw.githubusercontent.com/TWOJ_USER/vinted-sniper/main/okazje.json")
-      .then(res => res.json())
-      .then(data => {
+    const RAW_URL = "https://raw.githubusercontent.com/PasczureQ/Vinted-sniper/main/okazje.json";
+
+    async function load() {
+      try {
+        const res = await fetch(RAW_URL);
+        if (!res.ok) throw new Error("Błąd pobierania JSON: " + res.status);
+        const data = await res.json();
         const list = document.getElementById("list");
+        const status = document.getElementById("status");
+        list.innerHTML = "";
+        if (!Array.isArray(data) || data.length === 0) {
+          status.textContent = "Brak ofert (okazje.json puste). Możesz wgrać przykładowe dane lub poczekać na scraper.";
+          return;
+        }
+        status.textContent = `Znaleziono ${data.length} ofert`;
         data.forEach(item => {
           const li = document.createElement("li");
-          li.innerHTML = `<a href="${item.link}" target="_blank">${item.title} - ${item.price}</a>`;
+          li.className = "item";
+          const a = document.createElement("a");
+          a.href = item.link || "#";
+          a.target = "_blank";
+          a.rel = "noopener";
+          a.textContent = `${item.title} — ${item.price || "brak ceny"}`;
+          li.appendChild(a);
           list.appendChild(li);
         });
-      });
+      } catch (e) {
+        document.getElementById("status").textContent = "Błąd: " + e.message;
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", load);
   </script>
 </body>
 </html>
