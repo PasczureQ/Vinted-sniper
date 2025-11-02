@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Vinted Snajper</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Okazje do resellu</h1>
+  <ul id="list"></ul>
+
+  <script>
+    fetch("https://raw.githubusercontent.com/TWOJ_USER/vinted-sniper/main/okazje.json")
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById("list");
+        data.forEach(item => {
+          const li = document.createElement("li");
+          li.innerHTML = `<a href="${item.link}" target="_blank">${item.title} - ${item.price}</a>`;
+          list.appendChild(li);
+        });
+      });
+  </script>
+</body>
+</html>
