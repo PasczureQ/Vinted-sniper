@@ -5,7 +5,7 @@ import json
 import time
 
 HEADERS = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/100 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
 }
 
 def scrape_vinted(query="hotwheels", max_items=30):
@@ -15,14 +15,11 @@ def scrape_vinted(query="hotwheels", max_items=30):
     soup = BeautifulSoup(r.text, "html.parser")
     items = []
 
-    # nowy selektor dla aktualnego HTML Vinted
-    selected_items = soup.select('div[data-testid="catalog-item"]')[:max_items]
-    print(f"[DEBUG] {query}: znaleziono {len(selected_items)} elementów w HTML", flush=True)
+    # nowy, aktualny selektor dla 2025 HTML Vinted
+    selected_items = soup.select('a[href^="/item/"]')[:max_items]
+    print(f"[DEBUG] {query}: znaleziono {len(selected_items)} ofert", flush=True)
 
-    for it in selected_items:
-        a = it.select_one("a")
-        if not a:
-            continue
+    for a in selected_items:
         title_elem = a.select_one("div[class*='ItemTile_title']")
         price_elem = a.select_one("div[class*='ItemTile_price']")
         title = title_elem.get_text(strip=True) if title_elem else ""
@@ -35,7 +32,7 @@ def scrape_vinted(query="hotwheels", max_items=30):
     return items
 
 if __name__ == "__main__":
-    queries = ["hotwheels", "nike", "lego"]  # możesz zmienić / dodać inne
+    queries = ["hotwheels", "nike", "lego"]  # zmień lub dodaj inne
     all_items = []
     for q in queries:
         try:
