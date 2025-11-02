@@ -1,9 +1,9 @@
 name: Scrape Vinted
 
 on:
-  workflow_dispatch:   # pozwala uruchomić ręcznie
+  workflow_dispatch:
   schedule:
-    - cron: '0 * * * *'  # co godzinę
+    - cron: '0 * * * *'
 
 jobs:
   scrape:
@@ -21,6 +21,7 @@ jobs:
       - name: Install dependencies
         run: |
           npm install playwright
+          npx playwright install   # <-- to pobiera przeglądarki
 
       - name: Run scraper
         run: node scraper.js
@@ -30,7 +31,7 @@ jobs:
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add okazje.json
-          git commit -m "Update okazje.json"
+          git commit -m "Update okazje.json" || echo "No changes to commit"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
