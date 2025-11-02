@@ -1,35 +1,36 @@
 name: Scrape Vinted
-# dajemy uprawnienia zapisu do contenst (pliki) dla GITHUB_TOKEN
-permissions:
-  contents: write
 
 on:
+  workflow_dispatch:   # pozwala uruchomić ręcznie
   schedule:
-    - cron: '0 * * * *'   # co godzinę (UTC)
-  workflow_dispatch: {}
+    - cron: '0 * * * *'  # co godzinę
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo (with credentials)
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          persist-credentials: true    # ensure GITHUB_TOKEN is available for push
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+          node-version: '20'
+
       - name: Install dependencies
-        run: pip install requests beautifulsoup4
+        run: |
+          npm install playwright
+
       - name: Run scraper
-        run: python scraper.py
+        run: node scraper.js
+
       - name: Commit results
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add okazje.json || true
-          git commit -m "Update okazje" || echo "no changes"
-          git push origin HEAD:main
+          git add okazje.json
+          git commit -m "Update okazje.json"
+          git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
