@@ -1,5 +1,9 @@
 name: Scrape Vinted
 
+# dajemy permissions żeby GITHUB_TOKEN miał write do contents
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:
   schedule:
@@ -10,8 +14,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repository (with credentials)
         uses: actions/checkout@v3
+        with:
+          persist-credentials: true   # konieczne, aby GITHUB_TOKEN mógł pushować
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -20,8 +26,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          npm install playwright
-          npx playwright install   # <-- to pobiera przeglądarki
+          npm ci || npm install
+          npx playwright install
 
       - name: Run scraper
         run: node scraper.js
@@ -32,6 +38,7 @@ jobs:
           git config user.email "actions@github.com"
           git add okazje.json
           git commit -m "Update okazje.json" || echo "No changes to commit"
-          git push
+          # push using the token that checkout persisted
+          git push origin HEAD:main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
